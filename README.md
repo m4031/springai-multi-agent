@@ -244,7 +244,6 @@ mvn spring-boot:run -Dspring-boot.run.profiles=gemini
 {
   "destination": "Kyoto, Japan",
   "numberOfDays": 4,
-  "budget": 1500.00,
   "preferences": "temples, local food, walking-friendly, avoid crowds"
 }
 ```
@@ -255,42 +254,161 @@ mvn spring-boot:run -Dspring-boot.run.profiles=gemini
 curl -X POST http://localhost:8080/api/trips/plan \
   -H "Content-Type: application/json" \
   -d '{
-        "destination": "Kyoto, Japan",
-        "numberOfDays": 4,
-        "budget": 1500.00,
+        "destination": "Agra and Mathura",
+        "numberOfDays": 3,
         "preferences": "temples, local food, walking-friendly"
       }'
 ```
 
-**Response** (`TripPlanningResponse`): the original `request`, plus `research`, `budget`, `itinerary` (null if budget exceeded), `review`, and a `status` string.
+**Response** (`TripPlanningResponse`): the original `request`, plus `research`, `itinerary`, `review`, and a `status` string.
 
 ```json
 {
-  "request": { "...": "..." },
-  "research": {
-    "attractions": ["Fushimi Inari", "Arashiyama Bamboo Grove"],
-    "travelTips": ["Buy an IC card for transit"],
-    "foodOptions": ["Nishiki Market"]
+  "request": {
+    "destination": "Agra and Mathura",
+    "numberOfDays": 3,
+    "preferences": "temples, local food, walking-friendly"
   },
-  "budget": {
-    "accommodationCost": 600.00,
-    "transportCost": 120.00,
-    "foodCost": 300.00,
-    "activityCost": 200.00,
-    "totalCost": 1220.00,
-    "withinBudget": true,
-    "recommendations": ["..."]
+  "research": {
+    "attractions": [
+      "Shri Krishna Janmabhoomi Temple Complex (Mathura)",
+      "Dwarkadhish Temple and Vishram Ghat (Mathura)",
+      "Banke Bihari Temple (Vrindavan, Mathura district)",
+      "Prem Mandir (Vrindavan, Mathura district)",
+      "Taj Mahal and Mehtab Bagh (Agra)",
+      "Agra Fort (Agra)",
+      "Mankameshwar Temple and Rawatpara Heritage Lanes (Agra)"
+    ],
+    "travelTips": [
+      "Taj Mahal is closed for visitors on Fridays; plan the Agra segment accordingly.",
+      "The temple alleys in Mathura and Vrindavan are primarily pedestrian; wear comfortable, easy-to-remove walking shoes.",
+      "Monkeys are prevalent and aggressive near temples in Mathura and Vrindavan; keep spectacles, sunglasses, bags, and food items tucked away securely.",
+      "Modest dress covering knees and shoulders is required when visiting active Hindu temples.",
+      "Agra and Mathura are approximately 55 kilometers apart, easily connected by a 1-hour train or cab journey.",
+      "Book entry tickets online in advance for Taj Mahal and Agra Fort via the Archaeological Survey of India (ASI) portal to bypass queue times."
+    ],
+    "foodOptions": [
+      "Mathura Peda at Brijwasi Mithai Wala (Mathura)",
+      "Kachori, Jalebi, and Makhan Samosa near Vishram Ghat (Mathura)",
+      "Bedmi Puri, Aloo Sabzi, and Nagori Halwa at Deviram Sweets (Agra)",
+      "Traditional Agra Petha at Panchi Petha (Agra)",
+      "Local street food and chaat at Sadar Bazaar (Agra)",
+      "Thali and dairy delicacies at Shankar Mithai Wala (Mathura)"
+    ]
   },
   "itinerary": {
     "days": [
-      { "day": 1, "morning": "...", "afternoon": "...", "evening": "...", "estimatedCost": 300.00 }
+      {
+        "day": 1,
+        "morning": "Arrive in Mathura, check into your stay, and explore Shri Krishna Janmabhoomi Temple Complex on foot. Enjoy a breakfast of fresh Kachori, Jalebi, and Makhan Samosa near Vishram Ghat.",
+        "afternoon": "Explore Dwarkadhish Temple and walk along the riverfront steps of Vishram Ghat, followed by lunch featuring local thali and dairy delicacies at Shankar Mithai Wala.",
+        "evening": "Attend the evening Yamuna Aarti at Vishram Ghat and stroll through the pedestrian bazaars to taste and buy Mathura Peda at Brijwasi Mithai Wala."
+      },
+      {
+        "day": 2,
+        "morning": "Take a short battery rickshaw ride to Vrindavan to navigate the pedestrian alleys and seek blessings at Banke Bihari Temple, keeping eyewear safely tucked away.",
+        "afternoon": "Visit the architectural Prem Mandir complex, then take a 1-hour pre-booked cab or train transit to Agra (55 km) and check into a Taj Ganj hotel.",
+        "evening": "Take a walking tour of the Rawatpara Heritage Lanes, pay respects at the historic Mankameshwar Temple, and sample traditional Agra Petha at Panchi Petha."
+      },
+      {
+        "day": 3,
+        "morning": "Start early with a walking tour of the Taj Mahal using advance online tickets, followed by a hearty breakfast of Bedmi Puri, Aloo Sabzi, and Nagori Halwa at Deviram Sweets.",
+        "afternoon": "Tour the grand courtyards and palaces of Agra Fort using pre-booked ASI entry tickets for a smooth, self-paced walking exploration.",
+        "evening": "Catch sunset views of the Taj Mahal from Mehtab Bagh across the river, concluding the journey with an evening street food and chaat walk at Sadar Bazaar."
+      }
     ]
   },
   "review": {
     "valid": true,
-    "summary": "A well-balanced 4-day plan within budget.",
+    "summary": "A well-paced 3-day itinerary covering Mathura, Vrindavan, and Agra. It fulfills all preferences for temples, walking-friendly heritage routes, and iconic local food while remaining well within the ₹35,000 budget at an estimated total of ₹19,000.",
     "issues": [],
-    "recommendations": []
+    "recommendations": [
+      "Ensure Day 3 does not fall on a Friday, as the Taj Mahal is closed to visitors on Fridays.",
+      "Check midday temple closing hours for Prem Mandir and Banke Bihari Temple on Day 2, as sanctums often close between 12:00 PM and 4:30 PM.",
+      "Secure spectacles, cameras, and food items in zipped bags while walking through Vrindavan alleys to prevent monkey snatching."
+    ]
+  },
+  "status": "COMPLETED"
+}
+```
+
+```bash
+curl -X POST http://localhost:8080/api/trips/plan \
+  -H "Content-Type: application/json" \
+  -d '{
+        "destination": "Jaipur",
+        "numberOfDays": 3,
+        "preferences": "temples, local food, walking-friendly"
+      }'
+```
+
+**Response** (`TripPlanningResponse`): the original `request`, plus `research`, `itinerary`, `review`, and a `status` string.
+
+```json
+{
+  "request": {
+    "destination": "Jaipur",
+    "numberOfDays": 3,
+    "preferences": "temples, local food, walking-friendly"
+  },
+  "research": {
+    "attractions": [
+      "Govind Dev Ji Temple (City Palace complex)",
+      "Birla Mandir (Laxmi Narayan Temple)",
+      "Galtaji Temple (Monkey Temple)",
+      "Moti Dungri Ganesh Temple",
+      "Jagat Shiromani Temple (Amer)",
+      "Hawa Mahal and the Old City Bazaars walking precinct",
+      "City Palace and Jantar Mantar complex"
+    ],
+    "travelTips": [
+      "The Old Walled Pink City (Johari Bazaar, Bapu Bazaar) is best explored on foot early morning before market traffic peaks.",
+      "Most temples in Jaipur follow strict 'Aarti' schedules and remain closed between 12:00 PM and 4:30 PM.",
+      "Dress modestly when visiting temples; ensure shoulders and knees are covered, and be prepared to remove shoes at entrances.",
+      "Jaipur Metro provides direct, low-cost connectivity to Badi Chaupar for easy pedestrian access to central sights.",
+      "Wear slip-on shoes with good grip for navigating temple complexes and stone paved walking routes like Galtaji."
+    ],
+    "foodOptions": [
+      "Rawat Mishthan Bhandar (Pyaaz Kachori, Mawa Kachori)",
+      "Laxmi Mishthan Bhandar / LMB, Johari Bazaar (Ghewar, Rajasthani Thali)",
+      "Gulab Ji Chai Wale (Masala Chai, Bun Muska)",
+      "Pandit Kulfi (Traditional Kulfi Falooda near Hawa Mahal)",
+      "Samrat Restaurant (Poha, Jalebi, Samosa for morning breakfast)",
+      "Thali and Dal Baati Churma at traditional local eateries in the Old City"
+    ]
+  },
+  "itinerary": {
+    "days": [
+      {
+        "day": 1,
+        "morning": "Start with breakfast at Samrat Restaurant featuring Poha and Jalebi. Walk through the Old Walled Pink City precinct early to beat the crowds and attend the morning Aarti at Govind Dev Ji Temple inside the City Palace complex.",
+        "afternoon": "During the midday temple closure between 12:00 PM and 4:30 PM, tour the City Palace and Jantar Mantar complex. Enjoy a traditional Dal Baati Churma and Rajasthani Thali lunch at a local eatery in the Old City.",
+        "evening": "Embark on a pedestrian exploration of Johari Bazaar and Bapu Bazaar. Sample Ghewar at Laxmi Mishthan Bhandar (LMB) and conclude the night with traditional Kulfi Falooda at Pandit Kulfi near Hawa Mahal."
+      },
+      {
+        "day": 2,
+        "morning": "Enjoy Pyaaz Kachori and Mawa Kachori at Rawat Mishthan Bhandar, then take transit north to explore the historic Jagat Shiromani Temple in Amer on foot, taking note of its intricate carvings before midday.",
+        "afternoon": "Take the Jaipur Metro back towards central Jaipur while temples pause operations between 12:00 PM and 4:30 PM. Relax with Masala Chai and Bun Muska at Gulab Ji Chai Wale.",
+        "evening": "Wear slip-on walking shoes to navigate the paved stone walking route up to Galtaji Temple (Monkey Temple) in time for the late-afternoon opening and serene sunset Aarti."
+      },
+      {
+        "day": 3,
+        "morning": "Visit Moti Dungri Ganesh Temple for early morning prayers, followed by a short walk to the adjacent Birla Mandir (Laxmi Narayan Temple) to admire its white marble architecture.",
+        "afternoon": "Take a midday break while temples are closed from 12:00 PM to 4:30 PM; indulge in a hearty Rajasthani thali at LMB in Johari Bazaar and explore nearby pedestrian alleys.",
+        "evening": "Head via Jaipur Metro to Badi Chaupar to view Hawa Mahal and the illuminated Old City bazaars on foot, picking up souvenirs and savouring street snacks before departure."
+      }
+    ]
+  },
+  "review": {
+    "valid": true,
+    "summary": "A well-structured 3-day walking and culinary itinerary through Jaipur focused on prominent temples and heritage sights. At an estimated cost of ₹11,000, it stays well within the ₹15,000 budget while adhering to temple opening schedules and pedestrian-friendly zones.",
+    "issues": [
+      "Day 2 mentions taking the Jaipur Metro back from Amer; however, the metro line terminates at Badi Chaupar and does not extend to Amer, requiring a bus, cab, or auto-rickshaw for that leg."
+    ],
+    "recommendations": [
+      "Use a local bus, taxi, or e-rickshaw to travel between Badi Chaupar and Amer for the Day 2 morning visit to Jagat Shiromani Temple.",
+      "Consider varying the Day 3 lunch venue to explore other traditional eateries in the Old City instead of revisiting LMB."
+    ]
   },
   "status": "COMPLETED"
 }
